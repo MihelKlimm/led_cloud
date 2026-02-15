@@ -1,36 +1,18 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PRO-SPORTS AI 🏒🏐
+### Cloud-Powered 4K 60FPS Sports Video Enhancer
 
-## Getting Started
+Commercial-grade pipeline for Social Media Managers. Convert amateur stadium footage into flamboyant, high-bitrate viral clips.
 
-First, run the development server:
+## 🚀 Key Features
+- **AI Motion Synthesis:** Convert 30fps to smooth 60fps movement (perfect for hockey pucks/volleyball spikes).
+- **4K Upscaling:** AI-driven pixel density enhancement.
+- **Visual Pop:** Automatic flamboyant color grading for stadium lighting.
+- **Serverless GPU:** Powered by NVIDIA A10G GPUs via Modal.com.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🏗 Architecture (The Triangle of Power)
+- **Face:** Next.js (Vercel)
+- **Vault:** Backblaze B2 (S3-Compatible Storage)
+- **Brain:** Python/FFmpeg AI (Modal.com)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 💰 Budget Optimization
+Architected to process ~1,000 videos for under $200 total budget by utilizing pay-as-you-go GPU compute.
