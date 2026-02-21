@@ -9,6 +9,7 @@ export async function POST(request: Request) {
     const client = new S3Client({
       region: "eu-central-003", 
       endpoint: `https://${process.env.B2_ENDPOINT}`,
+      forcePathStyle: true,
       credentials: {
         accessKeyId: process.env.B2_KEY_ID!,
         secretAccessKey: process.env.B2_APPLICATION_KEY!,
@@ -19,13 +20,20 @@ export async function POST(request: Request) {
       Bucket: process.env.B2_BUCKET_NAME,
       Key: fileName,
       ContentType: contentType,
+      // CRITICAL FIX: This stops the SDK from adding 'x-amz-checksum'
+      // which is what is causing the CORS block.
+      ChecksumAlgorithm: undefined, 
     });
 
-    // Create a secure URL that is valid for 1 hour
-    const url = await getSignedUrl(client, command, { expiresIn: 3600 });
+    // We only sign the bare minimum headers
+    const url = await getSignedUrl(client, command, { 
+      expiresIn: 3600,
+      unhoisted_headers: new Set(["content-type"]),
+    });
     
     return NextResponse.json({ url, fileName });
   } catch (error) {
+    console.error("API Error:", error);
     return NextResponse.json({ error: "Failed to generate ticket" }, { status: 500 });
   }
 }
