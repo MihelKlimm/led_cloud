@@ -36,16 +36,24 @@ export default function SportsPortal() {
     try {
       const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
 
-      // 1. Upload to Backblaze via your Server-Side API
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("fileName", fileName);
-      
-      const uploadRes = await fetch("/api/upload", { method: "POST", body: formData });
-      if (!uploadRes.ok) throw new Error("Cloud offering failed.");
+      // 1. Get the "Permission Ticket" from Vercel (This is a small JSON request, no 413 error)
+      const ticketResponse = await fetch("/api/upload", {
+        method: "POST",
+        body: JSON.stringify({ fileName, contentType: file.type }),
+      });
+      const { url } = await ticketResponse.json();
+
+      // 2. Upload DIRECTLY to Backblaze (Bypasses Vercel's 4.5MB limit)
+      const uploadRes = await fetch(url, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type },
+      });
+
+      if (!uploadRes.ok) throw new Error("Vault refused the offering.");
       setProgress(20);
 
-      // 2. Trigger Cloud GPU (The Brain)
+      // 3. Trigger the Modal GPU
       const modalRes = await fetch(process.env.NEXT_PUBLIC_MODAL_URL!, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -54,30 +62,26 @@ export default function SportsPortal() {
       const modalData = await modalRes.json();
       const targetFile = modalData.filename;
 
-      // 3. Polling the Vault for the Result
+      // 4. Polling (Remains the same)
       const checkInterval = setInterval(async () => {
-        try {
-          const finalUrl = `https://${process.env.NEXT_PUBLIC_B2_BUCKET_NAME}.${process.env.NEXT_PUBLIC_B2_ENDPOINT}/${targetFile}`;
-          const check = await fetch(finalUrl, { method: 'HEAD' });
-          
-          if (check.ok) {
-            clearInterval(checkInterval);
-            setProgress(100);
-            setDownloadUrl(finalUrl);
-            setIsProcessing(false);
-          } else {
-            setProgress((prev) => (prev < 99 ? prev + 0.3 : prev));
-          }
-        } catch (e) { /* Quietly wait */ }
+        const finalUrl = `https://${process.env.NEXT_PUBLIC_B2_BUCKET_NAME}.${process.env.NEXT_PUBLIC_B2_ENDPOINT}/${targetFile}`;
+        const check = await fetch(finalUrl, { method: 'HEAD' });
+        if (check.ok) {
+          clearInterval(checkInterval);
+          setProgress(100);
+          setDownloadUrl(finalUrl);
+          setIsProcessing(false);
+        } else {
+          setProgress((prev) => (prev < 99 ? prev + 0.3 : prev));
+        }
       }, 10000);
 
-    } catch (err: any) {
-      console.error(err);
-      setError("The connection to the Cloud was severed.");
+    } catch (err) {
+      setError("The cloud offering was too large or refused.");
       setIsProcessing(false);
     }
   };
-
+      
   return (
     <div className="min-h-screen bg-[#050505] text-slate-200 flex flex-col items-center justify-center p-6 font-sans selection:bg-sky-500/30">
       <div className="max-w-md w-full space-y-12 text-center">
