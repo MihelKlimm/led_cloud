@@ -34,20 +34,19 @@ export default function SportsPortal() {
     setProgress(5);
 
     try {
-      const fileName = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
-
-      // 1. Get the "Permission Ticket" from Vercel (This is a small JSON request, no 413 error)
+      // 1. Get the ticket
       const ticketResponse = await fetch("/api/upload", {
         method: "POST",
         body: JSON.stringify({ fileName, contentType: file.type }),
       });
       const { url } = await ticketResponse.json();
 
-      // 2. Upload DIRECTLY to Backblaze (Bypasses Vercel's 4.5MB limit)
+      // 2. The Simple Upload (This bypasses the Checksum/CORS block)
       const uploadRes = await fetch(url, {
         method: "PUT",
-        body: file,
-        headers: { "Content-Type": file.type },
+        body: file, // Send the raw file
+        // IMPORTANT: We do NOT set any headers here. 
+        // The signed URL already knows the content-type.
       });
 
       if (!uploadRes.ok) throw new Error("Vault refused the offering.");

@@ -7,14 +7,12 @@ export async function POST(request: Request) {
     const { fileName, contentType } = await request.json();
 
     const client = new S3Client({
-      region: "eu-central-003", 
+      region: "eu-central-003",
       endpoint: `https://${process.env.B2_ENDPOINT}`,
       forcePathStyle: true,
-      // CRITICAL: This tells the SDK to STOP adding the checksums that cause CORS errors
-      requestChecksumCalculation: "WHEN_REQUIRED",
       credentials: {
-        accessKeyId: process.env.B2_KEY_ID!,
-        secretAccessKey: process.env.B2_APPLICATION_KEY!,
+        accessKeyId: process.env.B2_KEY_ID!.trim(),
+        secretAccessKey: process.env.B2_APPLICATION_KEY!.trim(),
       },
     });
 
@@ -24,10 +22,13 @@ export async function POST(request: Request) {
       ContentType: contentType,
     });
 
-    const url = await getSignedUrl(client, command, { expiresIn: 3600 });
-    return NextResponse.json({ url });
+    // Clean version: Just the basic options that TypeScript definitely knows
+    const url = await getSignedUrl(client, command, { 
+      expiresIn: 3600 
+    });
     
-  } catch (error) {
+    return NextResponse.json({ url, fileName });
+  } catch (error: any) {
     console.error("API Error:", error);
     return NextResponse.json({ error: "Failed to generate ticket" }, { status: 500 });
   }
