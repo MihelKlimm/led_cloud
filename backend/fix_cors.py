@@ -1,6 +1,6 @@
 import boto3
 
-# Connect directly to your Backblaze S3 API
+# We use your verified keys to talk directly to Backblaze
 s3 = boto3.client(
     's3',
     endpoint_url='https://s3.eu-central-003.backblazeb2.com',
@@ -8,16 +8,20 @@ s3 = boto3.client(
     aws_secret_access_key='K003KyHRdCXHXJpa2mAceqyQ4krDdlk'
 )
 
-# The ultimate "Allow All" rule for browsers
+# This rule tells Backblaze: "Trust the Vercel website and my local computer"
 cors_configuration = {
     'CORSRules': [{
         'AllowedHeaders': ['*'],
         'AllowedMethods': ['PUT', 'POST', 'GET', 'HEAD'],
-        'AllowedOrigins': ['*'],
-        'ExposeHeaders': ['ETag']
+        'AllowedOrigins': ['*'], # Unlocks for everyone
+        'ExposeHeaders': ['ETag'],
+        'MaxAgeSeconds': 3600
     }]
 }
 
-print("Unlocking Backblaze S3 CORS...")
-s3.put_bucket_cors(Bucket='pro-sports-ai-storage', CORSConfiguration=cors_configuration)
-print("✅ SUCCESS: Backblaze S3 CORS is now permanently unlocked for Vercel!")
+try:
+    print("🔓 Unlocking Backblaze B2 Vault...")
+    s3.put_bucket_cors(Bucket='pro-sports-ai-storage', CORSConfiguration=cors_configuration)
+    print("✅ SUCCESS: Cloud Vault is now open for your website!")
+except Exception as e:
+    print(f"❌ ERROR: {e}")
