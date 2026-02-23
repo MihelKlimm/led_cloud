@@ -8,7 +8,7 @@ export default function SportsPortal() {
   const [fileId, setFileId] = useState("");
   
   // REPLACE THIS with your Modal URL
-  const MODAL_URL = "PASTE_YOUR_MODAL_URL_HERE"; 
+  const MODAL_URL = "https://mihelklimm--led-cloud-engine-web.modal.run";
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
